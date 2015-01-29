@@ -105,12 +105,6 @@ class SymmetricEncryption {
 	private $_hmacLength = 0;
 	
 	/**
-	 * @var boolean $_useCompression flag to indicate the use of gz compression
-	 */
-	private $_useCompression = 0;
-	
-	
-	/**
 	 * The two to the power of iterations number of iterations to perform on the key derivation step
 	 * 2^12 iterations is an acceptable lower limit
 	 */
@@ -118,23 +112,14 @@ class SymmetricEncryption {
 	
 	/**
 	 * @param integer $keyDerivationIterationsLog2 The number of iterations to perform when stretching the key
-	 * @param boolean $useCompression optional switch to toggle compression using gz, default is false
 	 */
-	public function __construct($keyDerivationIterationsLog2 = self::PBKDF2_ITERATIONS_LOG2_MINIMUM, $useCompression = false) {
+	public function __construct($keyDerivationIterationsLog2 = self::PBKDF2_ITERATIONS_LOG2_MINIMUM) {
 		if ($keyDerivationIterationsLog2 < self::PBKDF2_ITERATIONS_LOG2_MINIMUM) {
 			trigger_error('Number of iterations used for key stretching is too low, using default instead', E_USER_WARNING);
 		} else {
 			$this->_pbkdf2IterationsLog2 = $keyDerivationIterationsLog2;
 		}
-				
-		if ($useCompression) {
-			if (!function_exists('gzcompress') || !function_exists('gzuncompress')) {
-				trigger_error('Compression not available, compression disabled', E_USER_WARNING);
-			}
-			$this->_useCompression = $useCompression;
-		}
 		
-	
 		$this->_ivLength = mcrypt_get_iv_size(self::CIPHER_ALGORITHM, self::CIPHER_MODE);
 		if (false === $this->_ivLength || 0 >= $this->_ivLength) {
 			trigger_error('Could not determine IV size', E_USER_ERROR);
@@ -168,16 +153,11 @@ class SymmetricEncryption {
 		$cipherKey = $this->_HKDFexpand($derivedKey, $this->_cipherKeyLength, self::CIPHER_KEY_INFO);
 		$hmacKey = $this->_HKDFexpand($derivedKey, self::HMAC_KEY_LENGTH, self::HMAC_KEY_INFO);
 		
-		// step 3: compress plainText if required
-		if ($this->_useCompression) {
-			$plainText = gzcompress($plainText, 9);
-		}
-		
-		// step 4: encrypt the data
+		// step 3: encrypt the data
 		$iv = $this->_fetchRandomBytes($this->_ivLength);
 		$cipherText = mcrypt_encrypt(self::CIPHER_ALGORITHM, $cipherKey, $plainText, self::CIPHER_MODE, $iv);
 		
-		// step 5: authenticate the concatenated salt, IV and encrypted data
+		// step 4: authenticate the concatenated salt, IV and encrypted data
 		$data = $salt.$iterationsLog2.$iv.$cipherText;
 		$hmac = hash_hmac(self::HMAC_HASH_ALGORITHM, $data, $hmacKey, true);
 		
@@ -216,11 +196,6 @@ class SymmetricEncryption {
 		$cipherText = substr($authenticatedData, self::PBKDF2_SALT_LENGTH + 2 + $this->_ivLength);
 		if ( false === ($plainText = mcrypt_decrypt(self::CIPHER_ALGORITHM, $cipherKey, $cipherText, self::CIPHER_MODE, $iv)) ) {
 			throw new Exception('Failed decrypting the cipher text');
-		}
-		
-		// step 5: compress plainText if required
-		if ($this->_useCompression) {
-			$plainText = @gzuncompress($plainText);
 		}
 		
 		return $plainText;
