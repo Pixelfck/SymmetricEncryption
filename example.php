@@ -3,7 +3,7 @@ error_reporting(-1);
 require_once('symmetricEncryption.class.php');
 
 
-$crypto = new SymmetricEncryption(16, true);
+$crypto = new SymmetricEncryption(16);
 
 $password = 'correct horse battery staple';
 $original = 'Never roll your own crypto.';

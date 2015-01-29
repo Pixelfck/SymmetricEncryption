@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.00
+ * @version 1.01
  * @license EUPL (European Union Public Licence, v.1.1)
  * 
  * Example of usage:
@@ -60,8 +60,13 @@ class SymmetricEncryption {
 	/**
 	 * Algorithm to use for the symmetric encryption
 	 */
-	const CIPHER_ALGORITHM = MCRYPT_RIJNDAEL_128; // Rijndael-128 == AES128
-
+	const CIPHER_ALGORITHM = MCRYPT_RIJNDAEL_128; // Rijndael with 128 bits block size == AES
+	
+	/**
+	 * Length in bytes for key used by the cipher algorithm. We want AES-128 (AES with a key size of 128 bits)
+	 */
+	const CIPHER_KEY_LENGTH = 16;
+	
 	/**
 	 * Cipher mode of operation to use
 	 * CTR mode would be better (and safe us a lot of work), but is unfortunately not supported by PHP's mcrypt module
@@ -88,16 +93,11 @@ class SymmetricEncryption {
 	 */
 	const HMAC_KEY_INFO = 'AuthenticationKey'; 
 	
-
 	/**
 	 * @var integer $_ivLength length of initialisation vector for this algorithm and mode
 	 */
 	private $_ivLength = 0;
 	
-	/**
-	 * @var integer $_cipherKeyLength length in bytes of key used by the cipher algorithm
-	 */
-	private $_cipherKeyLength = 0;
 	
 	/**
 	 * @var integer $_hmacLength output length of the authentication hash algorithm in bytes
@@ -125,11 +125,6 @@ class SymmetricEncryption {
 			trigger_error('Could not determine IV size', E_USER_ERROR);
 		}
 		
-		$this->_cipherKeyLength = mcrypt_get_key_size(self::CIPHER_ALGORITHM, self::CIPHER_MODE);
-		if (false === $this->_cipherKeyLength) {
-			trigger_error('Could not determine required cipher key size', E_USER_ERROR);
-		}
-		
 		$this->_hmacLength = strlen(hash_hmac(self::HMAC_HASH_ALGORITHM, '', '', true));
 		if (false === $this->_hmacLength) {
 			trigger_error('Could not determine authentication algorithm output size', E_USER_ERROR);
@@ -150,7 +145,7 @@ class SymmetricEncryption {
 		$iterationsLog2 = pack('s', $this->_pbkdf2IterationsLog2);
 		
 		// step 2: stretch derived key for encryption and authentication
-		$cipherKey = $this->_HKDFexpand($derivedKey, $this->_cipherKeyLength, self::CIPHER_KEY_INFO);
+		$cipherKey = $this->_HKDFexpand($derivedKey, self::CIPHER_KEY_LENGTH, self::CIPHER_KEY_INFO);
 		$hmacKey = $this->_HKDFexpand($derivedKey, self::HMAC_KEY_LENGTH, self::HMAC_KEY_INFO);
 		
 		// step 3: encrypt the data
@@ -181,7 +176,7 @@ class SymmetricEncryption {
 		$derivedKey = $this->_PBKDF2($password, $salt, $iterationsLog2[1]);
 		
 		// step 2: stretch derived key for encryption and authentication
-		$cipherKey = $this->_HKDFexpand($derivedKey, $this->_cipherKeyLength, self::CIPHER_KEY_INFO);
+		$cipherKey = $this->_HKDFexpand($derivedKey, self::CIPHER_KEY_LENGTH, self::CIPHER_KEY_INFO);
 		$hmacKey = $this->_HKDFexpand($derivedKey, self::HMAC_KEY_LENGTH, self::HMAC_KEY_INFO);
 		
 		// step 3: verify the authentication
