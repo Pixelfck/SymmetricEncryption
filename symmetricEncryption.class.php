@@ -114,6 +114,10 @@ class SymmetricEncryption {
 	 * @param integer $keyDerivationIterationsLog2 The number of iterations to perform when stretching the key
 	 */
 	public function __construct($keyDerivationIterationsLog2 = self::PBKDF2_ITERATIONS_LOG2_MINIMUM) {
+		if (0 <> (ini_get('mbstring.func_overload') & MB_OVERLOAD_STRING)) {
+			trigger_error('Incompatible Multibyte String functions overloading detected', E_USER_ERROR);
+		}
+		
 		if ($keyDerivationIterationsLog2 < self::PBKDF2_ITERATIONS_LOG2_MINIMUM) {
 			trigger_error('Number of iterations used for key stretching is too low, using default instead', E_USER_WARNING);
 		} else {
