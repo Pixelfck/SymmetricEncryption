@@ -196,7 +196,6 @@ class SymmetricEncryption {
 		return $plainText;
 	}
 	
-	
 	/**
 	 * Fetch random bytes
 	 * @param integer $length the required number of bytes to fetch
@@ -207,29 +206,6 @@ class SymmetricEncryption {
 			trigger_error('Could not read random data', E_USER_ERROR);
 		}
 		return $random;
-	}
-	
-	/**
-	 * Derive a cryptograpic key from a password (see: https://tools.ietf.org/html/rfc2898)
-	 * @param string $password the password to derive a key from
-	 * @param string $salt the salt to use in the derivation process
-	 * @return a cryptographic key derived from the password and salt
-	 */
-	private function _PBKDF2($password, $salt, $iterationsLog2) {
-		$derivedKey = '';
-		$iterationCount = pow(2, $iterationsLog2);
-		for($i = 1; $i <= self::PBKDF2_BLOCK_COUNT; $i++) {
-			$last = $salt . pack('N', $i); // $i encoded as 4 bytes, big endian.
-			
-			$last = $xorSum = hash_hmac(self::PBKDF2_HASH_ALGORITHM, $last, $password, true); // first iteration
-			for ($j = 1; $j < $iterationCount; $j++) { // perform $iterationCount - 1 iterations
-				$xorSum ^= ($last = hash_hmac(self::PBKDF2_HASH_ALGORITHM, $last, $password, true));
-			}
-			
-			$derivedKey .= $xorSum;
-		}
-		
-		return $derivedKey;
 	}
 	
 	/**
@@ -262,6 +238,29 @@ class SymmetricEncryption {
 			trigger_error('Failed expanding key to desired length', E_USER_ERROR);
 		}
 		return $outputKey;
+	}
+	
+	/**
+	 * Derive a cryptograpic key from a password (see: https://tools.ietf.org/html/rfc2898)
+	 * @param string $password the password to derive a key from
+	 * @param string $salt the salt to use in the derivation process
+	 * @return a cryptographic key derived from the password and salt
+	 */
+	private function _PBKDF2($password, $salt, $iterationsLog2) {
+		$derivedKey = '';
+		$iterationCount = pow(2, $iterationsLog2);
+		for($i = 1; $i <= self::PBKDF2_BLOCK_COUNT; $i++) {
+			$last = $salt . pack('N', $i); // $i encoded as 4 bytes, big endian.
+			
+			$last = $xorSum = hash_hmac(self::PBKDF2_HASH_ALGORITHM, $last, $password, true); // first iteration
+			for ($j = 1; $j < $iterationCount; $j++) { // perform $iterationCount - 1 iterations
+				$xorSum ^= ($last = hash_hmac(self::PBKDF2_HASH_ALGORITHM, $last, $password, true));
+			}
+			
+			$derivedKey .= $xorSum;
+		}
+		
+		return $derivedKey;
 	}
 }
 
