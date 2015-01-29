@@ -182,7 +182,8 @@ class SymmetricEncryption {
 		// step 3: verify the authentication
 		$hmac = substr($cipherText, - $this->_hmacLength);
 		$authenticatedData = substr($cipherText, 0, - $this->_hmacLength);
-		if ($hmac !== hash_hmac(self::HMAC_HASH_ALGORITHM, $authenticatedData, $hmacKey, true)) {
+		
+		if ( !$this->_constantTimeCompare($hmac, hash_hmac(self::HMAC_HASH_ALGORITHM, $authenticatedData, $hmacKey, true)) ) {
 			throw new Exception('Signature verification failed!');
 		}
 		
@@ -194,6 +195,24 @@ class SymmetricEncryption {
 		}
 		
 		return $plainText;
+	}
+	
+	/**
+	 * Constant time string comparison function
+	 * @param string $strA
+	 * @param string $strB
+	 * @return bool true if parameters $strA and $strB are equal, false otherwise
+	 */
+	private function _constantTimeCompare($strA, $strB) {
+		$lengthA = strlen($strA);
+		$lengthB = strlen($strB);
+		$minLength = min($lengthA, $lengthB);
+		
+		$result = $lengthA ^ $lengthB;
+		for ($i = 0; $i < $minLength; $i++) {
+			$result |= ord($strA{$i}) ^ ord($strB{$i});
+		}
+		return (0 === $result);	
 	}
 	
 	/**
