@@ -1,0 +1,12 @@
+CHANGE LOG:
+-----------
+
+Version 1.01
+- Added changelog file,
+- Added constant time signature verification as to prevent possible timing attacks,
+- Made sure the library now uses AES-128 instead of AES-256,
+- Having Multibyte String string function overloading active now results in a E_USER_ERROR,
+- Removed build-in support for compression.
+
+Version 1.0
+- Initial release.

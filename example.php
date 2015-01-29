@@ -24,4 +24,3 @@ echo '$decrypted ('.strlen($decrypted).' bytes)  = <pre>'.$decrypted."</pre><br/
 
 
 echo 'identical = <b>'.($original === $decrypted ? 'True' : 'False')."</b><br/>\n";
-
