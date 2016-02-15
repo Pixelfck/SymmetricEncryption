@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.01
+ * @version 1.02
  * @license EUPL (European Union Public Licence, v.1.1)
  * 
  * Example of usage:
@@ -8,7 +8,7 @@
  *   $password = 'correct horse battery staple';
  *   $crypto = new SymmetricEncryption(20, true);
  *   $encrypted = $crypto->encrypt('Never roll your own crypto.', $password);
- *   $decrypted = $crypto->decrypt($encrypted_string, $password);
+ *   $decrypted = $crypto->decrypt($encrypted, $password);
  *   echo $decrypted; // Never roll your own crypto.
  */
 
@@ -164,7 +164,7 @@ class SymmetricEncryption {
 	}
 
 	/**
-	 * check authentication and decrypt encrypted data
+	 * Check authentication and decrypt encrypted data
 	 * @param string $cipherText
 	 * @param string $password
 	 * @throws Exception
