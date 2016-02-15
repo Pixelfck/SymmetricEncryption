@@ -1,6 +1,11 @@
 CHANGE LOG:
 -----------
 
+Version 1.02
+- Updated the doc block example inside symmetricEncryption.class.php
+- Updated the example code inside example.php
+- Updated the readme
+
 Version 1.01
 - Added changelog file,
 - Added constant time signature verification as to prevent possible timing attacks,
