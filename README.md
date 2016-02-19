@@ -1,3 +1,4 @@
+[![License](https://poser.pugx.org/driftwood/symmetric-encryption/license?style=plastic)](https://packagist.org/packages/driftwood/symmetric-encryption) 
 SymmetricEncryption
 ===================
 
