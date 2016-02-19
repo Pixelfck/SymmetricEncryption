@@ -1,12 +1,14 @@
 <?php
+namespace Driftwood;
+
 /**
- * @version 1.02
+ * @version 1.03
  * @license EUPL (European Union Public Licence, v.1.1)
  * 
  * Example of usage:
  * 
  *   $password = 'correct horse battery staple';
- *   $crypto = new SymmetricEncryption(20, true);
+ *   $crypto = new SymmetricEncryption(20);
  *   $encrypted = $crypto->encrypt('Never roll your own crypto.', $password);
  *   $decrypted = $crypto->decrypt($encrypted, $password);
  *   echo $decrypted; // Never roll your own crypto.
@@ -130,7 +132,7 @@ class SymmetricEncryption {
 		}
 		
 		$this->_hmacLength = strlen(hash_hmac(self::HMAC_HASH_ALGORITHM, '', '', true));
-		if (false === $this->_hmacLength) {
+		if (0 >= $this->_hmacLength) {
 			trigger_error('Could not determine authentication algorithm output size', E_USER_ERROR);
 		}
 	}
@@ -175,7 +177,7 @@ class SymmetricEncryption {
 		$salt = substr($cipherText, 0, self::PBKDF2_SALT_LENGTH);
 		$iterationsLog2 = unpack('s', substr($cipherText, self::PBKDF2_SALT_LENGTH, 2));
 		if ($iterationsLog2[1] > $this->_pbkdf2IterationsLog2) {
-			throw new Exception('PBKDF2 iterations out of bounds');
+			throw new \Exception('PBKDF2 iterations out of bounds');
 		}
 		$derivedKey = $this->_PBKDF2($password, $salt, $iterationsLog2[1]);
 		
@@ -188,14 +190,14 @@ class SymmetricEncryption {
 		$authenticatedData = substr($cipherText, 0, - $this->_hmacLength);
 		
 		if ( !$this->_constantTimeCompare($hmac, hash_hmac(self::HMAC_HASH_ALGORITHM, $authenticatedData, $hmacKey, true)) ) {
-			throw new Exception('Signature verification failed!');
+			throw new \Exception('Signature verification failed!');
 		}
 		
 		// step 4: decrypt the data
 		$iv = substr($authenticatedData, self::PBKDF2_SALT_LENGTH + 2, $this->_ivLength);
 		$cipherText = substr($authenticatedData, self::PBKDF2_SALT_LENGTH + 2 + $this->_ivLength);
 		if ( false === ($plainText = mcrypt_decrypt(self::CIPHER_ALGORITHM, $cipherKey, $cipherText, self::CIPHER_MODE, $iv)) ) {
-			throw new Exception('Failed decrypting the cipher text');
+			throw new \Exception('Failed decrypting the cipher text');
 		}
 		
 		return $plainText;

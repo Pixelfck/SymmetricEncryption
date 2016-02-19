@@ -1,6 +1,11 @@
 CHANGE LOG:
 -----------
 
+Version 1.03
+- Added unit tests
+- Updated project structure for compatibility with [PSR-4](http://www.php-fig.org/psr/psr-4/) and [Composer](https://getcomposer.org/)
+- Improved hash_hmac expected output length validity check
+
 Version 1.02
 - Updated the doc block example inside symmetricEncryption.class.php
 - Updated the example code inside example.php
