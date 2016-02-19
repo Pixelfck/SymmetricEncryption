@@ -2,7 +2,7 @@
 namespace Driftwood;
 
 /**
- * @version 1.03
+ * @version 1.0.3
  * @license EUPL (European Union Public Licence, v.1.1)
  * 
  * Example of usage:
