@@ -18,10 +18,22 @@ Review status
 -------------
 Class SymmetricEncryption has received some informal code reviewing, but not nearly enough to be guaranteed to be secure. Having said that, it is probably more secure than what most people can come up with themselves.
 
-The use of a password instead of a key
---------------------------------------
-SymmetricEncryption expects the user to supply a password. However, passwords are, generally speaking, weak authenticators and it would be more secure to require a strong cryptographic key instead. This choice for requiring a password was made to facilitate maximum simplicity (the user supplied password is stretched into a key using PBKDF2). There is (of course) no maximum password length for SymmetricEncryption, nor is there any requirement that it cannot be binary. So you are strongly encouraged to pick a very long, randomly generated set of bytes as your password.
+Installation
+------------
+You can either download the code as a [.zip file](https://github.com/Pixelfck/SymmetricEncryption/archive/master.zip) or use [Composer](https://getcomposer.org/) to download it directly from [packagist](https://packagist.org/packages/driftwood/symmetric-encryption), by adding the following to your composer.json file.
+
+~~~ json
+{
+	"require": {
+		"driftwood/symmetric-encryption": "dev-master"
+    }
+}
+~~~
 
 Maintenance status
 ------------------
 This class is actively maintained, yet there are no frequent updates. This is a good thing: updates would mean that there was something that needed fixing, which is generally a very bad thing in cryptography.
+
+The use of a password instead of a key
+--------------------------------------
+SymmetricEncryption expects the user to supply a password. However, passwords are, generally speaking, weak authenticators and it would be more secure to require a strong cryptographic key instead. This choice for requiring a password was made to facilitate maximum simplicity (the user supplied password is stretched into a key using PBKDF2). There is (of course) no maximum password length for SymmetricEncryption, nor is there any requirement that it cannot be binary. So you are strongly encouraged to pick a very long, randomly generated set of bytes as your password.
