@@ -1,6 +1,5 @@
 {
     "name": "driftwood/symmetric-encryption",
-    "version": "1.0",
     "description": "PHP wrapper around the Mcrypt library providing preconfigured, binary safe, Authenticated Symmetric Encryption.",
     "keywords": ["encryption"],
     "type": "library",
