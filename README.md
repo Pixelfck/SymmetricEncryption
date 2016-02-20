@@ -26,9 +26,27 @@ You can either download the code as a [.zip file](https://github.com/Pixelfck/Sy
 ~~~ json
 {
 	"require": {
-		"driftwood/symmetric-encryption": "dev-master"
+		"driftwood/symmetric-encryption": ">=1.1.0"
     }
 }
+~~~
+
+Usage
+-----
+Since SymmetricEncryption comes preconfigured, you can encrypt and decrypt data using:
+ 
+~~~ php
+// Assuming a PSR-4 compatible autoloader
+
+use Driftwood\SymmetricEncryption;
+$password = 'correct horse battery staple';
+
+$crypto = new SymmetricEncryption(20);
+
+$encrypted = $crypto->encrypt('Never roll your own crypto.', $password);
+$decrypted = $crypto->decrypt($encrypted, $password);
+
+echo $decrypted; // Never roll your own crypto.
 ~~~
 
 Maintenance status
