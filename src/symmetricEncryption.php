@@ -7,6 +7,7 @@ namespace Driftwood;
  * 
  * Example of usage:
  * 
+ *   use Driftwood\SymmetricEncryption;
  *   $password = 'correct horse battery staple';
  *   $crypto = new SymmetricEncryption(20);
  *   $encrypted = $crypto->encrypt('Never roll your own crypto.', $password);
