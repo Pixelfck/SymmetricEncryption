@@ -1,17 +1,17 @@
 CHANGE LOG:
 -----------
 
-Version 1.0.3
+Version 1.1.2
 - Added unit tests
 - Updated project structure for compatibility with [PSR-4](http://www.php-fig.org/psr/psr-4/) and [Composer](https://getcomposer.org/)
 - Improved hash_hmac expected output length validity check
 
-Version 1.0.2
+Version 1.1.1
 - Updated the doc block example inside symmetricEncryption.class.php
 - Updated the example code inside example.php
 - Updated the readme
 
-Version 1.0.1
+Version 1.1.0
 - Added changelog file,
 - Added constant time signature verification as to prevent possible timing attacks,
 - Made sure the library now uses AES-128 instead of AES-256,

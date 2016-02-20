@@ -2,8 +2,8 @@
 namespace Driftwood;
 
 /**
- * @version 1.0.3
- * @license EUPL (European Union Public Licence, v.1.1)
+ * @version 1.1.2
+ * @license EUPL-1.1 (European Union Public Licence, v.1.1)
  * 
  * Example of usage:
  * 
@@ -16,8 +16,8 @@ namespace Driftwood;
 
  
 /**
- * A class which makes Symmetric Encryption easy by encapsulating all the choices
- * configuration options into a single class.
+ * A class which makes Symmetric Encryption easy by encapsulating all the choices and
+ * configuration options into a single preconfigured class.
  */
 class SymmetricEncryption {
 	
