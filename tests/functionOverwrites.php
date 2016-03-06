@@ -26,11 +26,11 @@ function ini_get($varName) {
 	return \ini_get($varName);
 }
 
-function mcrypt_get_iv_size($cipher, $mode) {
-	if (getMockFunctionActive('mcrypt_get_iv_size')) {
+function openssl_cipher_iv_length($method) {
+	if (getMockFunctionActive('openssl_cipher_iv_length')) {
 		return 0;
 	}
-	return \mcrypt_get_iv_size($cipher, $mode);
+	return \openssl_cipher_iv_length($method);
 }
 
 function hash_hmac($algo, $data, $key, $raw_output) {
@@ -38,4 +38,28 @@ function hash_hmac($algo, $data, $key, $raw_output) {
 		return false;
 	}
 	return \hash_hmac($algo, $data, $key, $raw_output);
+}
+
+function openssl_random_pseudo_bytes($length, &$crypto_strong = null) {
+	if (getMockFunctionActive('openssl_random_pseudo_bytes_readError')) {
+		return false;
+	} elseif (getMockFunctionActive('openssl_random_pseudo_bytes_qualityFail')) {
+		$crypto_strong = false;
+		return str_repeat(0, $length);
+	}
+	return \openssl_random_pseudo_bytes($length, $crypto_strong);
+}
+
+function openssl_get_cipher_methods($aliases = false) {
+	if (getMockFunctionActive('openssl_get_cipher_methods')) {
+		return array();
+	}
+	return \openssl_get_cipher_methods($aliases);
+}
+
+function openssl_decrypt($data, $method, $password, $options = 0, $iv = '') {
+	if (getMockFunctionActive('openssl_decrypt')) {
+		return false;
+	}
+	return \openssl_decrypt($data, $method, $password, $options, $iv);
 }

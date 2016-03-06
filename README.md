@@ -1,8 +1,9 @@
+[![Latest Stable Version](https://poser.pugx.org/driftwood/symmetric-encryption/v/stable?format=plastic)](https://packagist.org/packages/driftwood/symmetric-encryption)
 [![License](https://poser.pugx.org/driftwood/symmetric-encryption/license?style=plastic)](https://packagist.org/packages/driftwood/symmetric-encryption) 
 SymmetricEncryption
 ===================
 
-PHP wrapper around the Mcrypt library providing preconfigured Authenticated Symmetric Encryption.
+PHP wrapper around the OpenSSL library providing preconfigured Authenticated Symmetric Encryption.
 
 - Simple to use
 - Uses only well-known cryptographic building blocks
@@ -26,9 +27,27 @@ You can either download the code as a [.zip file](https://github.com/Pixelfck/Sy
 ~~~ json
 {
 	"require": {
-		"driftwood/symmetric-encryption": "dev-master"
+		"driftwood/symmetric-encryption": ">=2.0.0"
     }
 }
+~~~
+
+Usage
+-----
+Since SymmetricEncryption comes preconfigured, you can encrypt and decrypt data using:
+ 
+~~~ php
+// Assuming a PSR-4 compatible autoloader
+
+use Driftwood\SymmetricEncryption;
+$password = 'correct horse battery staple';
+
+$crypto = new SymmetricEncryption(20);
+
+$encrypted = $crypto->encrypt('Never roll your own crypto.', $password);
+$decrypted = $crypto->decrypt($encrypted, $password);
+
+echo $decrypted; // Never roll your own crypto.
 ~~~
 
 Maintenance status

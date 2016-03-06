@@ -7,11 +7,9 @@ class SymmetricEncryptionTest extends \PHPUnit_Framework_TestCase {
 	
 	const PASSWORD = 'correct horse battery staple';
 	
-	private $_encrypted = null;
+	const PLAIN_TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 	
-	public function setUp() {
-		$this->_encrypted = base64_decode('E7yiRHL84CCzJ+gIu6YVNRQAjZfGnFgG7jDq0LiJoeF3mvhVOikMemU+IdnNNKFfxnpSbJWfqIPwLVHx9IAy7Wu+la1Rsv3MJJpXWIRoJWD9OMa7meEqlKY8J4+RUvKDtIu4g7YYhl04T4i7fLqmCHFMJOkyJ50Ti7g=');
-	}
+	const CIPHER_TEXT = '0IfYyf22fTOe0x+sBHIEmg8AJY0qoiq1M+fHW55KIvasnMn+s86QOaGPDpv7NUH09Vc0gvvJDSt1NKtK5f3ze2xIKyOU8z9gzISibGPpYyRRxi1N42ixEC42N0bAQPx0RiVgAmj0OYfvLCxUWMjHa9mcGJSMBg7Cu0A=';
 	
 	/**
 	 * Test the Multibyte String functions overloading constructor guard clause
@@ -43,11 +41,26 @@ class SymmetricEncryptionTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	/**
-	 * Test the mcrypt_get_iv_size constructor constructor guard clause
+	 * Test the openssl_get_cipher_methods output constructor guard clause
+	 */
+	public function testSupportedCipherMethods() {
+		$this->setExpectedException('\\PHPUnit_Framework_Error');
+		\Driftwood\setMockFunctionActive('openssl_get_cipher_methods');
+		
+		try {
+			$crypto = new SymmetricEncryption(12);
+		} catch (\PHPUnit_Framework_Error $e) {
+			$this->assertEquals($e->getMessage(), 'Cipher method AES-128-CFB not available');
+			throw $e;
+		}
+	}
+	
+	/**
+	 * Test the openssl_cipher_iv_length constructor constructor guard clause
 	 */
 	public function testIvSizeFunctionFailError() {
 		$this->setExpectedException('\\PHPUnit_Framework_Error');
-		\Driftwood\setMockFunctionActive('mcrypt_get_iv_size');
+		\Driftwood\setMockFunctionActive('openssl_cipher_iv_length');
 		
 		try {
 			$crypto = new SymmetricEncryption(12);
@@ -72,25 +85,57 @@ class SymmetricEncryptionTest extends \PHPUnit_Framework_TestCase {
 		}
 	}
 	
+	
+	
+	/**
+	 * 01
+	 */
+	public function testFetchRandomBytes_readError() {
+		$this->setExpectedException('\\Exception');
+		\Driftwood\setMockFunctionActive('openssl_random_pseudo_bytes_readError');
+		
+		try {
+			$crypto = new SymmetricEncryption(12);
+			$crypto->encrypt(SELF::PLAIN_TEXT, self::PASSWORD);
+		} catch (\Exception $e) {
+			$this->assertEquals($e->getMessage(), 'Could not read random data');
+			throw $e;
+		}
+	}
+	
+	/**
+	 * 02
+	 */
+	public function testFetchRandomBytes_qualityFail() {
+		$this->setExpectedException('\\Exception');
+		\Driftwood\setMockFunctionActive('openssl_random_pseudo_bytes_qualityFail');
+		
+		try {
+			$crypto = new SymmetricEncryption(12);
+			$crypto->encrypt(SELF::PLAIN_TEXT, self::PASSWORD);
+		} catch (\Exception $e) {
+			$this->assertEquals($e->getMessage(), 'Quality of random data is not sufficient for cryptographic use');
+			throw $e;
+		}
+	}
+	
 	/**
 	 * Test the encrypt method against the decrypt method
 	 */
 	public function testEncryptDecrypt() {
-		$plainText = 'Never roll your own crypto test.';
-		
 		$crypto = new SymmetricEncryption(12);
 		
-		$encrypted = $crypto->encrypt($plainText, self::PASSWORD);
+		$encrypted = $crypto->encrypt(SELF::PLAIN_TEXT, self::PASSWORD);
 		
-		$this->assertEquals($plainText, $crypto->decrypt($encrypted, self::PASSWORD));
+		$this->assertEquals(SELF::PLAIN_TEXT, $crypto->decrypt($encrypted, self::PASSWORD));
 	}
 	
 	/**
 	 * Test decryption of know value cipher text
 	 */
 	public function testDecrypt() {
-		$crypto = new SymmetricEncryption(20);
-		$this->assertEquals($crypto->decrypt($this->_encrypted, self::PASSWORD), 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.');
+		$crypto = new SymmetricEncryption(16);
+		$this->assertEquals($crypto->decrypt(base64_decode(self::CIPHER_TEXT), self::PASSWORD), 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.');
 	}
 	
 	/**
@@ -99,9 +144,9 @@ class SymmetricEncryptionTest extends \PHPUnit_Framework_TestCase {
 	public function testTooManyItterationsException() {
 		$this->setExpectedException('\\Exception');
 		
-		$crypto = new SymmetricEncryption(16);
+		$crypto = new SymmetricEncryption(14);
 		try {
-			$crypto->decrypt($this->_encrypted, self::PASSWORD);
+			$crypto->decrypt(base64_decode(self::CIPHER_TEXT), self::PASSWORD);
 		} catch (\Exception $e) {
 			$this->assertEquals($e->getMessage(), 'PBKDF2 iterations out of bounds');
 			throw $e;
@@ -114,9 +159,9 @@ class SymmetricEncryptionTest extends \PHPUnit_Framework_TestCase {
 	public function testWrongPasswordException() {
 		$this->setExpectedException('\\Exception');
 		
-		$crypto = new SymmetricEncryption(20);		
+		$crypto = new SymmetricEncryption(16);		
 		try {
-			$crypto->decrypt($this->_encrypted, 'clueless');
+			$crypto->decrypt(base64_decode(self::CIPHER_TEXT), 'clueless');
 		} catch (\Exception $e) {
 			$this->assertEquals($e->getMessage(), 'Signature verification failed!');
 			throw $e;
@@ -129,7 +174,7 @@ class SymmetricEncryptionTest extends \PHPUnit_Framework_TestCase {
 	public function testTamperedDataException() {
 		$this->setExpectedException('\\Exception');
 		
-		$crypto = new SymmetricEncryption(20);
+		$crypto = new SymmetricEncryption(16);
 		$corrupted = base64_decode('oV7gIO6zYQVRw7vWhjETAQ0AAAAAAAAAAAAAAAAAAAAAABI7ua0JZobYs7reCgmqMKt3DZkKVldsd0f94TRMt+AxHba3XkD/PDxXiUhBJ28z3+iQW7B5');
 		
 		try {
@@ -141,16 +186,32 @@ class SymmetricEncryptionTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	/**
-	 * Test decryption failure due internal error in mcrypt_decrypt (in this case, due to a too short IV value)
+	 * Test decryption failure due internal error in openssl_decrypt (in this case, due to a too short IV value)
 	 * Because of the cipher text is authenticated, it would be quite hard to find a corrupted cipher text in a real world use case
 	 */
 	public function testCorruptedCipherTextException() {
-		$this->setExpectedException('\\Exception');
+		$this->setExpectedException('\\PHPUnit_Framework_Error_Warning');
 		
 		$crypto = new SymmetricEncryption(12);
-		$corrupted = base64_decode('bI+svL8MnzGuDJZu5k2ppgwAAAAAAAAAAAAAAAAAAAAAgu62ymOxM77feP7z/CJybN22g8BuaQZ2dzmkTTNDSSY=');
+		$corrupted = base64_decode('8i/4Tww0RCH/iZOzcYnAXQwAtAMDwN/p+a8DAGWxeA4cKiWNhTnEtbhzDrxkQXEDolUtV+T7A9L6Bwys1w==');
 		try {
-			@$crypto->decrypt($corrupted, self::PASSWORD); // Warning suppressed because we check the return value
+			$crypto->decrypt($corrupted, self::PASSWORD); // Warning suppressed because we check the return value
+		} catch (\PHPUnit_Framework_Error_Warning $e) {
+			$this->assertEquals($e->getMessage(), 'openssl_decrypt(): IV passed is only 11 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0');
+			throw $e;
+		}
+	}
+	
+	/**
+	 * Test generic decryption failure
+	 */
+	public function testGenericDecryptFail() {
+		$this->setExpectedException('\\Exception');
+		\Driftwood\setMockFunctionActive('openssl_decrypt');
+		
+		try {
+			$crypto = new SymmetricEncryption(16);
+			$crypto->decrypt(base64_decode(self::CIPHER_TEXT), self::PASSWORD);
 		} catch (\Exception $e) {
 			$this->assertEquals($e->getMessage(), 'Failed decrypting the cipher text');
 			throw $e;

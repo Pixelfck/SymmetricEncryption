@@ -2,11 +2,12 @@
 namespace Driftwood;
 
 /**
- * @version 1.1.2
+ * @version 2.0.0
  * @license EUPL-1.1 (European Union Public Licence, v.1.1)
  * 
  * Example of usage:
  * 
+ *   use Driftwood\SymmetricEncryption;
  *   $password = 'correct horse battery staple';
  *   $crypto = new SymmetricEncryption(20);
  *   $encrypted = $crypto->encrypt('Never roll your own crypto.', $password);
@@ -60,20 +61,15 @@ class SymmetricEncryption {
 	const HKDF_HASH_BYTE_LENGtH = 32;
 	
 	/**
-	 * Algorithm to use for the symmetric encryption
+	 * We will use AES123 in Cipher Feedback mode for the encryption performed by the OpenSSL library
+	 * CTR mode would be better (and safe us a lot of work), but is unfortunately not supported by PHP yet
 	 */
-	const CIPHER_ALGORITHM = MCRYPT_RIJNDAEL_128; // Rijndael with 128 bits block size == AES
+	const CIPHER_METHOD = 'AES-128-CFB'; // Rijndael with 128 bits block size and key size
 	
 	/**
 	 * Length in bytes for key used by the cipher algorithm. We want AES-128 (AES with a key size of 128 bits)
 	 */
 	const CIPHER_KEY_LENGTH = 16;
-	
-	/**
-	 * Cipher mode of operation to use
-	 * CTR mode would be better (and safe us a lot of work), but is unfortunately not supported by PHP's mcrypt module
-	 */
-	const CIPHER_MODE = MCRYPT_MODE_CFB;
 	
 	/**
 	 * Constant string for key stretching into cipher key
@@ -125,8 +121,13 @@ class SymmetricEncryption {
 		} else {
 			$this->_pbkdf2IterationsLog2 = $keyDerivationIterationsLog2;
 		}
+				
+		$availableCiphers = openssl_get_cipher_methods(false);
+		if ( ! in_array (self::CIPHER_METHOD, $availableCiphers, true)) {
+			trigger_error('Cipher method '.self::CIPHER_METHOD.' not available', E_USER_ERROR);
+		}
 		
-		$this->_ivLength = mcrypt_get_iv_size(self::CIPHER_ALGORITHM, self::CIPHER_MODE);
+		$this->_ivLength = openssl_cipher_iv_length(self::CIPHER_METHOD);
 		if (false === $this->_ivLength || 0 >= $this->_ivLength) {
 			trigger_error('Could not determine IV size', E_USER_ERROR);
 		}
@@ -156,7 +157,7 @@ class SymmetricEncryption {
 		
 		// step 3: encrypt the data
 		$iv = $this->_fetchRandomBytes($this->_ivLength);
-		$cipherText = mcrypt_encrypt(self::CIPHER_ALGORITHM, $cipherKey, $plainText, self::CIPHER_MODE, $iv);
+		$cipherText = openssl_encrypt($plainText, self::CIPHER_METHOD, $cipherKey, OPENSSL_RAW_DATA, $iv);
 		
 		// step 4: authenticate the concatenated salt, IV and encrypted data
 		$data = $salt.$iterationsLog2.$iv.$cipherText;
@@ -196,7 +197,8 @@ class SymmetricEncryption {
 		// step 4: decrypt the data
 		$iv = substr($authenticatedData, self::PBKDF2_SALT_LENGTH + 2, $this->_ivLength);
 		$cipherText = substr($authenticatedData, self::PBKDF2_SALT_LENGTH + 2 + $this->_ivLength);
-		if ( false === ($plainText = mcrypt_decrypt(self::CIPHER_ALGORITHM, $cipherKey, $cipherText, self::CIPHER_MODE, $iv)) ) {
+		
+		if ( false === ($plainText = openssl_decrypt($cipherText, self::CIPHER_METHOD, $cipherKey, OPENSSL_RAW_DATA, $iv)) ) {
 			throw new \Exception('Failed decrypting the cipher text');
 		}
 		
@@ -227,8 +229,12 @@ class SymmetricEncryption {
 	 * @return string $iv random bytes
 	 */
 	private function _fetchRandomBytes($length) {
-		if ( false === ($random = mcrypt_create_iv($length, MCRYPT_DEV_URANDOM)) ) {
-			trigger_error('Could not read random data', E_USER_ERROR);
+		$cryptoQuality = null;
+		if ( false === ($random = openssl_random_pseudo_bytes($length, $cryptoQuality)) ) {
+			throw new \Exception('Could not read random data');
+		}
+		if (true !== $cryptoQuality) {
+			throw new \Exception('Quality of random data is not sufficient for cryptographic use');
 		}
 		return $random;
 	}
@@ -244,10 +250,10 @@ class SymmetricEncryption {
 	private function _HKDFexpand($pseudoRandomKey, $length, $info = '') {
 		// Sanity-check the desired output length.
 		if (strlen($pseudoRandomKey) < self::HKDF_HASH_BYTE_LENGtH) {
-			trigger_error('Pseudorandom key is of incorrect length', E_USER_ERROR);
+			throw new \Exception('Pseudorandom key is of incorrect length');
 		}
 		if ( !is_int($length) || 0 > $length || 255 * self::HKDF_HASH_BYTE_LENGtH < $length) {
-			trigger_error('length argument must be between 0 and '.(255 * self::HKDF_HASH_BYTE_LENGtH), E_USER_ERROR);
+			throw new \Exception('length argument must be between 0 and '.(255 * self::HKDF_HASH_BYTE_LENGtH));
 		}
 		
 		// Expand the Pseudo Random Key into Output Keying Material
@@ -260,7 +266,7 @@ class SymmetricEncryption {
 		
 		// Slice Output Keying Material to desired length
 		if ( false === ($outputKey = substr($t, 0, $length)) ) {
-			trigger_error('Failed expanding key to desired length', E_USER_ERROR);
+			throw new \Exception('Failed expanding key to desired length');
 		}
 		return $outputKey;
 	}

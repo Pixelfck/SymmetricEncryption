@@ -1,6 +1,10 @@
 CHANGE LOG:
 -----------
 
+Version 2.0.0
+- Replaced `mcrypt_` family of functions with the `openssl_` family of functions.
+- Added some more unit tests
+
 Version 1.1.2
 - Added unit tests
 - Updated project structure for compatibility with [PSR-4](http://www.php-fig.org/psr/psr-4/) and [Composer](https://getcomposer.org/)
