@@ -14,7 +14,7 @@ Intended use
 ------------
 This class is intended to function as a preconfigured, drop-in option for whenever symetric encryption is needed within your PHP project.
 
-The SymmetricEncryption class is intended to be used 'as-is': the various magic constants defined are *not* configuration options. Instead, they are there to facilitate easy review of choices made. If you change any of the defined constants, or any other part of the code for that matter, the implied security no longer exists; it would be reduced to just another incarnation of home grown crypto.
+The SymmetricEncryption class is intended to be used 'as-is': the various class constants defined are *not* configuration options. Instead, they are there to facilitate easy review of choices made. If you change any of the defined constants, or any other part of the code for that matter, the implied security no longer exists; it would be reduced to just another incarnation of home grown crypto.
 
 Review status
 -------------
