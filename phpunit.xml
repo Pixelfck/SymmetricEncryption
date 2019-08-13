@@ -1,8 +1,20 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <phpunit
+		backupGlobals="false"
+		backupStaticAttributes="false"
+		beStrictAboutOutputDuringTests="false"
+		beStrictAboutTestsThatDoNotTestAnything="true"
 		bootstrap="tests/bootstrap.php"
+		colors="true"
 		convertErrorsToExceptions="true"
-		>
+		convertNoticesToExceptions="false"
+		convertWarningsToExceptions="false"
+		forceCoversAnnotation="false"
+		processIsolation="false"
+		stopOnFailure="false"
+		stderr="true"
+		verbose="true"
+	>
 	<testsuites>
 		<testsuite name="tests">
 			<directory>tests</directory>
@@ -13,4 +25,7 @@
 			<directory suffix=".php">src</directory>
 		</whitelist>
 	</filter>
+	<logging>
+		<log type="coverage-html" target="report" lowUpperBound="65" highLowerBound="95"/>
+	</logging>
 </phpunit>
