@@ -123,6 +123,9 @@ class SymmetricEncryption {
 		}
 				
 		$availableCiphers = openssl_get_cipher_methods(false);
+		array_walk($availableCiphers, function(&$item){
+			$item = strtoupper($item);
+		});
 		if ( ! in_array (self::CIPHER_METHOD, $availableCiphers, true)) {
 			trigger_error('Cipher method '.self::CIPHER_METHOD.' not available', E_USER_ERROR);
 		}
