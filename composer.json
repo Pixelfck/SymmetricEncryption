@@ -12,6 +12,9 @@
         }
     ],
     "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^8.2"
+    },
     "autoload": {
         "psr-4": { "Driftwood\\": "src/" }
     }
