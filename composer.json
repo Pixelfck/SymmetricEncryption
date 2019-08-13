@@ -12,6 +12,10 @@
         }
     ],
     "minimum-stability": "stable",
+    "require": {
+        "ext-openssl": "*",
+		"ext-mbstring": "*"
+	},
     "require-dev": {
         "phpunit/phpunit": "^8.2"
     },
