@@ -1,2 +1,4 @@
 # PHPStorm
 /.idea/*
+vendor/
+report/
