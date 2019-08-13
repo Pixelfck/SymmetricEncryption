@@ -15,6 +15,9 @@ namespace Driftwood;
  *   echo $decrypted; // Never roll your own crypto.
  */
 
+use Exception;
+
+
 /**
  * A class which makes Symmetric Encryption easy by encapsulating all the choices and
  * configuration options into a single preconfigured class.
@@ -151,7 +154,7 @@ class SymmetricEncryption
 	 * @param string $plainText
 	 * @param string $password
 	 *
-	 * @return string unecrypted data
+	 * @return string unencrypted data
 	 * @throws \Exception
 	 */
 	public function encrypt($plainText, $password)
@@ -192,7 +195,7 @@ class SymmetricEncryption
 		$salt           = substr($cipherText, 0, self::PBKDF2_SALT_LENGTH);
 		$iterationsLog2 = unpack('s', substr($cipherText, self::PBKDF2_SALT_LENGTH, 2));
 		if ($iterationsLog2[1] > $this->_pbkdf2IterationsLog2) {
-			throw new \Exception('PBKDF2 iterations out of bounds');
+			throw new Exception('PBKDF2 iterations out of bounds');
 		}
 		$derivedKey = $this->_PBKDF2($password, $salt, $iterationsLog2[1]);
 		
@@ -205,7 +208,7 @@ class SymmetricEncryption
 		$authenticatedData = substr($cipherText, 0, -$this->_hmacLength);
 		
 		if (!$this->_constantTimeCompare($hmac, hash_hmac(self::HMAC_HASH_ALGORITHM, $authenticatedData, $hmacKey, true))) {
-			throw new \Exception('Signature verification failed!');
+			throw new Exception('Signature verification failed!');
 		}
 		
 		// step 4: decrypt the data
@@ -213,7 +216,7 @@ class SymmetricEncryption
 		$cipherText = substr($authenticatedData, self::PBKDF2_SALT_LENGTH + 2 + $this->_ivLength);
 		
 		if (false === ($plainText = openssl_decrypt($cipherText, self::CIPHER_METHOD, $cipherKey, OPENSSL_RAW_DATA, $iv))) {
-			throw new \Exception('Failed decrypting the cipher text');
+			throw new Exception('Failed decrypting the cipher text');
 		}
 		
 		return $plainText;
@@ -254,10 +257,10 @@ class SymmetricEncryption
 		$cryptoQuality = null;
 		
 		if (false === ($random = openssl_random_pseudo_bytes($length, $cryptoQuality))) {
-			throw new \Exception('Could not read random data');
+			throw new Exception('Could not read random data');
 		}
 		if (true !== $cryptoQuality) {
-			throw new \Exception('Quality of random data is not sufficient for cryptographic use');
+			throw new Exception('Quality of random data is not sufficient for cryptographic use');
 		}
 		
 		return $random;
@@ -278,10 +281,10 @@ class SymmetricEncryption
 	{
 		// Sanity-check the desired output length.
 		if (strlen($pseudoRandomKey) < self::HKDF_HASH_BYTE_LENGtH) {
-			throw new \Exception('Pseudorandom key is of incorrect length');
+			throw new Exception('Pseudorandom key is of incorrect length');
 		}
 		if (!is_int($length) || 0 > $length || 255 * self::HKDF_HASH_BYTE_LENGtH < $length) {
-			throw new \Exception('length argument must be between 0 and ' . (255 * self::HKDF_HASH_BYTE_LENGtH));
+			throw new Exception('length argument must be between 0 and ' . (255 * self::HKDF_HASH_BYTE_LENGtH));
 		}
 		
 		// Expand the Pseudo Random Key into Output Keying Material
@@ -294,17 +297,18 @@ class SymmetricEncryption
 		
 		// Slice Output Keying Material to desired length
 		if (false === ($outputKey = substr($t, 0, $length))) {
-			throw new \Exception('Failed expanding key to desired length');
+			throw new Exception('Failed expanding key to desired length');
 		}
 		
 		return $outputKey;
 	}
 	
 	/**
-	 * Derive a cryptograpic key from a password (see: https://tools.ietf.org/html/rfc2898)
+	 * Derive a cryptographic key from a password (see: https://tools.ietf.org/html/rfc2898)
 	 *
 	 * @param string $password the password to derive a key from
 	 * @param string $salt     the salt to use in the derivation process
+	 * @param int    $iterationsLog2
 	 *
 	 * @return string a cryptographic key derived from the password and salt
 	 */
