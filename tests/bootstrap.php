@@ -1,5 +1,5 @@
 <?php
 
-require(__DIR__ . '/functionOverwrites.php');
+require(__DIR__ . '/Mocks/functions.php');
 
-require(__DIR__ . '/../src/SymmetricEncryption.php');
+require_once(__DIR__ . '/../vendor/autoload.php');
