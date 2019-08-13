@@ -9,6 +9,7 @@ namespace Tests;
 
 use Netsilik\Testing\BaseTestCase AS NetsilikBaseTestCase;
 
+
 abstract class BaseTestCase extends NetsilikBaseTestCase
 {
 	/**

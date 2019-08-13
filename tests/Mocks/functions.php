@@ -5,7 +5,9 @@
  */
 namespace Driftwood
 {
+	
 	use Netsilik\Testing\Helpers\FunctionOverwrites;
+	
 	
 	function ini_get(string $varname) : string
 	{
@@ -14,7 +16,7 @@ namespace Driftwood
 		if (FunctionOverwrites::isActive(__FUNCTION__)) {
 			return FunctionOverwrites::shiftNextReturnValue(__FUNCTION__);
 		}
-
+		
 		return \ini_get($varname);
 	}
 	
@@ -25,7 +27,7 @@ namespace Driftwood
 		if (FunctionOverwrites::isActive(__FUNCTION__)) {
 			return FunctionOverwrites::shiftNextReturnValue(__FUNCTION__);
 		}
-
+		
 		return \openssl_cipher_iv_length($method);
 	}
 	
@@ -36,7 +38,7 @@ namespace Driftwood
 		if (FunctionOverwrites::isActive(__FUNCTION__)) {
 			return FunctionOverwrites::shiftNextReturnValue(__FUNCTION__);
 		}
-
+		
 		return \hash_hmac($algo, $data, $key, $raw_output);
 	}
 	

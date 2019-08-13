@@ -70,7 +70,7 @@ class DecryptTest extends BaseTestCase
 		
 		$crypto    = new SymmetricEncryption(12);
 		$corrupted = base64_decode('8i/4Tww0RCH/iZOzcYnAXQwAtAMDwN/p+a8DAGWxeA4cKiWNhTnEtbhzDrxkQXEDolUtV+T7A9L6Bwys1w==');
-
+		
 		$crypto->decrypt($corrupted, self::PASSWORD); // Warning suppressed because we check the return value
 		
 		self::assertErrorTriggered(E_WARNING, 'openssl_decrypt(): IV passed is only 11 bytes long, cipher expects an IV of precisely 16 bytes, padding with \0');

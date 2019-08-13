@@ -10,9 +10,9 @@ use Netsilik\Testing\Helpers\FunctionOverwrites;
 class EncryptTest extends BaseTestCase
 {
 	
-	const PASSWORD    = 'correct horse battery staple';
+	const PASSWORD   = 'correct horse battery staple';
 	
-	const PLAIN_TEXT  = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+	const PLAIN_TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 	
 	/**
 	 * 01
