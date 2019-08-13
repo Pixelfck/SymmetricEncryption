@@ -1,6 +1,11 @@
 CHANGE LOG:
 -----------
 
+Version 2.0.2
+- Added support for OpenSSL 1.1.1 lower-case cipher names,
+- Refactored PHPUnit tests for compatibility with PHPUnit 8.2,
+- Added 3 test cases to bring code coverage to 100%.
+
 Version 2.0.1
 - Fixed capitalisation issue that caused an issue with PSR4 auto loading,
 - Fixed coding style issue (whitespace usage),
