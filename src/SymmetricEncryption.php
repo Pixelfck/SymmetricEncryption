@@ -117,7 +117,7 @@ class SymmetricEncryption
 	 *
 	 * @param integer $keyDerivationIterationsLog2 The number of iterations to perform when stretching the key
 	 */
-	public function __construct($keyDerivationIterationsLog2 = self::PBKDF2_ITERATIONS_LOG2_MINIMUM)
+	public function __construct(int $keyDerivationIterationsLog2 = self::PBKDF2_ITERATIONS_LOG2_MINIMUM)
 	{
 		if (0 <> (ini_get('mbstring.func_overload') & MB_OVERLOAD_STRING)) {
 			trigger_error('Incompatible Multibyte String functions overloading detected', E_USER_ERROR);
@@ -157,7 +157,7 @@ class SymmetricEncryption
 	 * @return string unencrypted data
 	 * @throws \Exception
 	 */
-	public function encrypt($plainText, $password)
+	public function encrypt(string $plainText, string $password) : string
 	{
 		
 		// step 1: derive a key from the password
@@ -189,7 +189,7 @@ class SymmetricEncryption
 	 * @return string decrypted data
 	 * @throws \Exception
 	 */
-	public function decrypt($cipherText, $password)
+	public function decrypt(string $cipherText, string $password) : string
 	{
 		// step 1: find pbkdf2 salt and compute the derived key
 		$salt           = substr($cipherText, 0, self::PBKDF2_SALT_LENGTH);
@@ -230,7 +230,7 @@ class SymmetricEncryption
 	 *
 	 * @return bool true if parameters $strA and $strB are equal, false otherwise
 	 */
-	private function _constantTimeCompare($strA, $strB)
+	private function _constantTimeCompare(string $strA, string $strB) : bool
 	{
 		$lengthA   = strlen($strA);
 		$lengthB   = strlen($strB);
@@ -252,7 +252,7 @@ class SymmetricEncryption
 	 * @return string $iv random bytes
 	 * @throws \Exception
 	 */
-	private function _fetchRandomBytes($length)
+	private function _fetchRandomBytes(string $length) : string
 	{
 		$cryptoQuality = null;
 		
@@ -271,13 +271,13 @@ class SymmetricEncryption
 	 * Note: only the HKDF-Expand step is used here; the HKDF-Extract step has been replaced by PBKDF2
 	 *
 	 * @param string  $pseudoRandomKey a pseudo random key of at least self::HKDF_HASH_BYTE_LENGtH bytes in length
-	 * @param integer $length          the desired length of the output in bytes
+	 * @param int     $length          the desired length of the output in bytes
 	 * @param string  $info            optional string to feed into the algorithm as to differentiate the results
 	 *
 	 * @return string the stretched result of desired length of pseudo random bytes
 	 * @throws \Exception
 	 */
-	private function _HKDFexpand($pseudoRandomKey, $length, $info = '')
+	private function _HKDFexpand(string $pseudoRandomKey, int $length, string $info = '') : string
 	{
 		// Sanity-check the desired output length.
 		if (strlen($pseudoRandomKey) < self::HKDF_HASH_BYTE_LENGtH) {
@@ -312,7 +312,7 @@ class SymmetricEncryption
 	 *
 	 * @return string a cryptographic key derived from the password and salt
 	 */
-	private function _PBKDF2($password, $salt, $iterationsLog2)
+	private function _PBKDF2(string $password, string $salt, int $iterationsLog2) : string
 	{
 		$derivedKey     = '';
 		$iterationCount = pow(2, $iterationsLog2);
