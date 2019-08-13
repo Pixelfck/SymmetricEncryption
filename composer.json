@@ -17,9 +17,13 @@
 		"ext-mbstring": "*"
 	},
     "require-dev": {
+        "netsilik/base-test-case": "^0.9",
         "phpunit/phpunit": "^8.2"
     },
     "autoload": {
-        "psr-4": { "Driftwood\\": "src/" }
+        "psr-4": {
+            "Driftwood\\": "src/",
+            "Tests\\": "tests/"
+        }
     }
 }

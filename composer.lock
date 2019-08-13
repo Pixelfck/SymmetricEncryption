@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b4eeebb4420cc19df9879d6860e1d31",
+    "content-hash": "05533ba243120e84a4c368af2ea85f14",
     "packages": [],
     "packages-dev": [
         {
@@ -110,6 +110,51 @@
                 "object graph"
             ],
             "time": "2019-08-09T12:45:53+00:00"
+        },
+        {
+            "name": "netsilik/base-test-case",
+            "version": "0.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Netsilik/BaseTestCase.git",
+                "reference": "8dd6ba920c8e4eaab5c1cdb54e98012f864f274d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Netsilik/BaseTestCase/zipball/8dd6ba920c8e4eaab5c1cdb54e98012f864f274d",
+                "reference": "8dd6ba920c8e4eaab5c1cdb54e98012f864f274d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.3",
+                "phpunit/phpunit": "^8.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Netsilik\\Testing\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jacco-V",
+                    "role": "Developer",
+                    "homepage": "http://netsilik.nl"
+                }
+            ],
+            "description": "Base Test Case for PHPUnit, proving various extended options for unit testing.",
+            "homepage": "https://gitlab.com/Netsilik/BaseTestCase",
+            "keywords": [
+                "development",
+                "phpunit",
+                "testing",
+                "unit testing"
+            ],
+            "time": "2019-08-07T09:34:48+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -1533,6 +1578,9 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "ext-openssl": "*",
+        "ext-mbstring": "*"
+    },
     "platform-dev": []
 }
