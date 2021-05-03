@@ -238,7 +238,7 @@ class SymmetricEncryption
 		
 		$result = $lengthA ^ $lengthB;
 		for ($i = 0; $i < $minLength; $i++) {
-			$result |= ord($strA{$i}) ^ ord($strB{$i});
+			$result |= ord($strA[$i]) ^ ord($strB[$i]);
 		}
 		
 		return (0 === $result);
