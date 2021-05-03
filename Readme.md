@@ -27,7 +27,7 @@ You can either download the code as a [.zip file](https://github.com/Pixelfck/Sy
 ~~~ json
 {
 	"require": {
-		"driftwood/symmetric-encryption": ">=2.0.0"
+		"driftwood/symmetric-encryption": "^2.0.0"
     }
 }
 ~~~
